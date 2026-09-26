@@ -4,6 +4,7 @@ extends RefCounted
 const HEADER_SIZE := 9
 const CONTEXT_ENTITY := 0xFFFFFFFD
 const PING_ENTITY := 0xFFFFFFFE
+const RETIRED_WINDOW := 1024
 
 signal peer_connected(id: int)
 signal peer_disconnected(id: int)
@@ -16,6 +17,7 @@ var packet_tick: int
 var _entities: Dictionary[int, Object] = {}
 var _pending_packets: Dictionary[int, Array] = {}
 var _retired_entities: Dictionary[int, bool] = {}
+var _retired_order: Array[int] = []
 var _contexts: Dictionary[int, Object] = {}
 var _players: Array[int] = []
 var _ids := OrderedIndexBank.new()
@@ -73,7 +75,6 @@ func remove_player(id: int) -> void:
 
 func release_entity(id: int) -> void:
 	remove_entity(id)
-	_ids.free_index(id)
 
 
 func poll(_delta: float) -> void:
@@ -107,6 +108,9 @@ func remove_entity(id: int) -> void:
 	_entities.erase(id)
 	_pending_packets.erase(id)
 	_retired_entities[id] = true
+	_retired_order.append(id)
+	while _retired_order.size() > RETIRED_WINDOW:
+		_retired_entities.erase(_retired_order.pop_front())
 
 
 func register_context(peer_id: int, context: Object) -> void:
