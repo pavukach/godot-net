@@ -25,9 +25,7 @@ git submodule add git@github.com:<you>/godot_net.git addons/godot_net
 2. Call one of the init functions before the game needs networking:
 
    ```gdscript
-   NetManager.init_server()                            # defaults to NetConfig
-   NetManager.init_server(8080, "0.0.0.0")
-
+   NetManager.init_server(4242, "0.0.0.0")
    NetManager.init_client("wss", "example.com", 443)
    NetManager.init_client("ws", "127.0.0.1", 4242)
    ```
@@ -36,13 +34,15 @@ git submodule add git@github.com:<you>/godot_net.git addons/godot_net
    background. Await `NetManager.network.connected_to_server` to continue once
    you are online.
 
-3. Point the spawner at the node that replicated entities are added to, and
-   register the scenes that may be spawned:
+3. Register the scenes that may be spawned. Replicated entities are added to
+   the current scene unless you point the spawner somewhere else:
 
    ```gdscript
-   NetManager.spawner.world = get_node("/root/Game/World")
    NetManager.spawner.entities = [player.tscn, projectile.tscn]
    NetManager.spawner.rebuild_index()
+
+   # optional
+   NetManager.spawner.world = get_node("/root/Game/World")
    ```
 
 ## Spawning networked things
@@ -87,7 +87,6 @@ player; `stop_tracking` despawns it for them. `InterestZone` and
 - Timestamps come from a shared tick counter (`NetManager.timeline`), so the
   server and clients must run the same physics tick rate.
 - `NetConfig` holds the default host, port and bind address.
-
 ## Tuning
 
 | script | purpose |

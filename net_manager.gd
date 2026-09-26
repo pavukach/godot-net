@@ -19,7 +19,7 @@ func _ready() -> void:
 	add_child(interest)
 
 
-func init_server(port := NetConfig.PORT, bind_address := NetConfig.BIND_ADDRESS) -> void:
+func init_server(port: int, bind_address: String) -> void:
 	var ws := WebSocketMultiplayerPeer.new()
 	ws.create_server(port, bind_address)
 	network.set_peer(ws, true)

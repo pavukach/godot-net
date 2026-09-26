@@ -4,7 +4,16 @@ extends NetHost
 const METHOD_SPAWN := 0
 const METHOD_DESPAWN := 1
 
-var world: Node
+var _world: Node
+
+var world: Node:
+	get:
+		if _world == null:
+			_world = get_tree().current_scene
+		return _world
+	set(value):
+		_world = value
+
 var entities: Array[PackedScene] = []
 
 var scene_to_index: Dictionary = {}

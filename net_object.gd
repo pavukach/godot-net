@@ -12,28 +12,28 @@ func register_method(callable: Callable, arg_types: Array[ByteData.Type], reliab
 
 
 func register_event(callable: Callable, arg_types: Array[ByteData.Type], reliable: bool) -> int:
-	if NetManager.network.is_server():
-		return register_method(callable, arg_types, reliable)
 	return register_method(_wrap_event(callable), arg_types, reliable)
 
 
 func _wrap_event(callable: Callable) -> Callable:
 	return func(...args: Array) -> void:
+		if NetManager.network.is_server():
+			callable.callv(args)
+			return
 		var tick := NetManager.network.packet_tick
 		if NetManager.timeline.playhead() >= tick:
 			callable.callv(args)
 			return
 		var captured: Array = args.duplicate()
-		var fired := false
-		var on_tick: Callable
-		on_tick = func(passed_tick: int) -> void:
-			if fired or passed_tick < tick:
+		var state := {"fired": false, "on_tick": Callable()}
+		state["on_tick"] = func(passed_tick: int) -> void:
+			if state["fired"] or passed_tick < tick:
 				return
-			fired = true
-			if NetManager.timeline.tick_passed.is_connected(on_tick):
-				NetManager.timeline.tick_passed.disconnect(on_tick)
+			state["fired"] = true
+			if NetManager.timeline.tick_passed.is_connected(state["on_tick"]):
+				NetManager.timeline.tick_passed.disconnect(state["on_tick"])
 			callable.callv(captured)
-		NetManager.timeline.tick_passed.connect(on_tick)
+		NetManager.timeline.tick_passed.connect(state["on_tick"])
 
 
 func destroy() -> void:

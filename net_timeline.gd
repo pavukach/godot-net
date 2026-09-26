@@ -12,8 +12,7 @@ var _last_emitted_tick := -1
 
 func _ready() -> void:
 	process_priority = NetProcessPriority.TIMELINE
-	if not NetManager.network.is_server():
-		NetManager.network.packet_received.connect(_on_packet_received)
+	NetManager.network.packet_received.connect(_on_packet_received)
 
 
 func _physics_process(_delta: float) -> void:
@@ -29,6 +28,8 @@ func _process(delta: float) -> void:
 
 
 func _on_packet_received(tick: int) -> void:
+	if NetManager.network.is_server():
+		return
 	_latest_tick = maxi(_latest_tick, tick)
 
 
