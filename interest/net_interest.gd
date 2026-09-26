@@ -27,6 +27,8 @@ func start_tracking(entity_id: int, player_id: int) -> void:
 
 
 func stop_tracking(entity_id: int, player_id: int) -> void:
+	if not player_id in entity_per_player.get(entity_id, []):
+		return
 	entity_per_player[entity_id].erase(player_id)
 	NetManager.spawner.replicate_despawn(player_id, entity_id)
 
