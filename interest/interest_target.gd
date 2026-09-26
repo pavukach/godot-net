@@ -20,7 +20,7 @@ func _ready():
 	collider.shape = shape
 
 	add_child(collider)
-	collision_layer = NetInterest.INTEREST_LAYER
+	collision_layer = 1 << (NetInterest.TARGET_LAYER - 1)
 	collision_mask = 1 << (NetInterest.INTEREST_LAYER - 1)
 	monitoring = true
 	monitorable = true

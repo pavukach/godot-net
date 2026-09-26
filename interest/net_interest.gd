@@ -2,6 +2,7 @@ class_name NetInterest
 extends Node
 
 const INTEREST_LAYER := 2
+const TARGET_LAYER := 3
 
 var entity_per_player: Dictionary[int, Array] = {}
 
